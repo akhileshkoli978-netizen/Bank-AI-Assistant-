@@ -1,0 +1,398 @@
+BANKING FAQ – AI BANKING QUERY ASSISTANT
+
+============================================================
+
+1. BANKING ACCOUNTS
+   ============================================================
+
+Q: What is a savings account?
+
+A: A savings account is a bank account designed for individuals to deposit and save money while carrying out supported banking activities. Depending on the bank and account type, it may provide interest on the account balance and access to services such as debit cards, online banking, and ATM withdrawals.
+
+Q: How do I open a savings account?
+
+A: A savings account can generally be opened online through a bank's website or mobile application, or by visiting a bank branch. The customer normally completes an application and the applicable KYC verification process. Exact requirements depend on the bank and account type.
+
+Q: What documents are generally required to open a savings account?
+
+A: Banks may generally request identity proof, address proof, PAN or applicable tax identification details, a photograph, and other information required for KYC verification. Exact documents depend on the bank, account type, and applicable regulations.
+
+Q: What is KYC?
+
+A: KYC stands for Know Your Customer. It is a customer verification process used by financial institutions to verify customer identity and other required information.
+
+Q: What is a current account?
+
+A: A current account is generally designed for frequent transactions and is commonly used by businesses and customers who require higher transaction activity. Features, charges, and balance requirements depend on the bank and account type.
+
+Q: What is a zero-balance savings account?
+
+A: A zero-balance savings account is an account type that may not require the customer to maintain a specified minimum balance. Availability and conditions depend on the bank and account product.
+
+Q: What is minimum balance?
+
+A: Minimum balance is the amount that a bank may require a customer to maintain in an account. Requirements and applicable charges vary by bank and account type.
+
+Q: What is an account number?
+
+A: An account number is a unique identifier assigned to a customer's bank account. It is used by the bank to identify the account and process applicable banking transactions.
+
+Q: What is IFSC?
+
+A: IFSC stands for Indian Financial System Code. It is used to identify a specific bank branch for electronic fund transfers in India.
+
+Q: What is a bank statement?
+
+A: A bank statement is a record showing transactions and other account information for a specified period. It may include deposits, withdrawals, transfers, charges, and the account balance.
+
+============================================================
+2. FIXED DEPOSIT AND RECURRING DEPOSIT
+======================================
+
+Q: What is a fixed deposit?
+
+A: A fixed deposit allows a customer to deposit money for a predetermined period under the applicable terms and interest rate offered by the bank.
+
+Q: What is a recurring deposit?
+
+A: A recurring deposit allows a customer to deposit a specified amount at regular intervals for a predetermined period, subject to the bank's terms.
+
+Q: What is the difference between a fixed deposit and recurring deposit?
+
+A: In a fixed deposit, a customer generally deposits a lump sum amount for a predetermined period. In a recurring deposit, the customer generally deposits a specified amount at regular intervals for a predetermined period.
+
+Q: Can the interest rate on a fixed deposit vary?
+
+A: The applicable interest rate depends on the bank, deposit period, product type, and other applicable conditions. Customers should verify the current rate with the relevant bank.
+
+============================================================
+3. DEBIT CARDS
+==============
+
+Q: What is a debit card?
+
+A: A debit card can be used for supported purchases, online transactions, and cash withdrawals. Transactions generally use funds available through the linked bank account, subject to applicable limits and conditions.
+
+Q: How is a debit card different from a credit card?
+
+A: A debit card generally uses funds available through a linked bank account. A credit card provides a credit facility subject to a credit limit, fees, repayment requirements, and the issuer's terms.
+
+Q: What should I do if my debit card is lost?
+
+A: A lost debit card should be reported to the bank as soon as possible. The bank may provide options to block or temporarily disable the card and issue a replacement according to its procedures.
+
+Q: What is an ATM?
+
+A: An ATM, or Automated Teller Machine, allows customers to perform supported banking activities such as cash withdrawals, balance inquiries, and other services depending on the bank and ATM.
+
+============================================================
+4. CREDIT CARDS
+===============
+
+Q: What is a credit card?
+
+A: A credit card provides a credit facility that can be used for eligible purchases and transactions, subject to the issuer's terms, conditions, credit limit, fees, and repayment requirements.
+
+Q: What is a credit limit?
+
+A: A credit limit is the maximum amount of credit that a credit card issuer allows a customer to use, subject to the issuer's policies and assessment.
+
+Q: What is a credit card bill?
+
+A: A credit card bill is a statement showing the customer's eligible transactions, applicable charges, payments, and the amount due for the billing period.
+
+Q: What happens if a credit card payment is not made on time?
+
+A: Late or missed payments may result in applicable charges and may affect the customer's credit history according to the issuer's terms and applicable reporting practices.
+
+============================================================
+5. BANKING TRANSACTIONS
+=======================
+
+Q: What is a bank transfer?
+
+A: A bank transfer is the electronic movement of money from one bank account to another through a supported payment or banking system.
+
+Q: What is UPI?
+
+A: UPI, or Unified Payments Interface, is a payment system that enables supported users to make electronic payments and transfers using participating banking and payment applications.
+
+Q: What is NEFT?
+
+A: NEFT stands for National Electronic Funds Transfer. It is a system used for electronic transfer of funds between participating bank accounts in India, subject to applicable rules and bank procedures.
+
+Q: What is RTGS?
+
+A: RTGS stands for Real Time Gross Settlement. It is an electronic funds transfer system used for eligible transactions and is subject to applicable rules and limits.
+
+Q: What is IMPS?
+
+A: IMPS stands for Immediate Payment Service. It enables supported electronic fund transfers through participating banks and payment channels.
+
+Q: What should I do if a bank transaction fails?
+
+A: If a transaction fails, the customer should check the transaction status in the relevant banking application or statement. If money was debited but the transaction was unsuccessful, the customer should follow the bank's support or dispute-resolution process.
+
+Q: What should I do if I see an unknown transaction?
+
+A: An unknown transaction should be reported to the bank as soon as possible. The customer should review the transaction details, secure the relevant banking access, and follow the bank's fraud or dispute-reporting procedure.
+
+============================================================
+6. INTEREST RATES
+=================
+
+Q: What is interest on a savings account?
+
+A: Savings account interest is the amount a bank may pay on eligible account balances according to the applicable account terms and interest rate.
+
+Q: Do all banks offer the same savings account interest rate?
+
+A: No. Savings account interest rates can differ between banks and account types. Customers should verify the current applicable rate with the relevant bank.
+
+Q: What is a loan interest rate?
+
+A: A loan interest rate is the rate applied to the outstanding loan amount according to the lender's terms. The applicable rate can depend on the loan product, customer profile, and other factors.
+
+Q: Can interest rates change?
+
+A: Some interest rates may change depending on the product type and applicable terms. Customers should check the latest information provided by the relevant financial institution.
+
+============================================================
+7. LOANS
+========
+
+Q: What is a personal loan?
+
+A: A personal loan is a loan provided to an eligible borrower subject to the lender's terms, conditions, interest rate, fees, and repayment requirements.
+
+Q: What is a home loan?
+
+A: A home loan is a loan intended for eligible housing-related purposes, subject to the lender's eligibility criteria, interest rate, fees, documentation, and repayment terms.
+
+Q: What is an education loan?
+
+A: An education loan is a loan designed to help eligible students or applicants meet specified education-related expenses, subject to the lender's eligibility criteria and terms.
+
+Q: What factors can affect loan eligibility?
+
+A: Loan eligibility can depend on factors such as income, repayment capacity, credit history, existing obligations, applicant information, and the lender's criteria.
+
+Q: What is EMI?
+
+A: EMI stands for Equated Monthly Instalment. It is a scheduled payment that a borrower makes toward a loan according to the applicable repayment schedule.
+
+Q: What is loan tenure?
+
+A: Loan tenure is the period over which a loan is scheduled to be repaid according to the lender's terms.
+
+Q: What is collateral?
+
+A: Collateral is an asset that may be provided as security for certain types of loans. The requirement depends on the loan product and lender's terms.
+
+============================================================
+8. PERSONAL FINANCIAL MANAGEMENT
+================================
+
+Q: What is a budget?
+
+A: A budget is a plan for managing income and expenses over a specified period. It can help a person understand spending patterns and plan savings.
+
+Q: Why is budgeting important?
+
+A: Budgeting can help individuals track expenses, manage available income, identify unnecessary spending, and plan toward financial goals.
+
+Q: How can I reduce unnecessary spending?
+
+A: A person can review regular expenses, identify non-essential spending, set spending limits, compare recurring costs, and prioritize important financial goals.
+
+Q: How can I save money every month?
+
+A: A person can create a monthly budget, set a savings target, monitor expenses, reduce unnecessary spending, and automate eligible savings transfers where appropriate.
+
+Q: What is an emergency fund?
+
+A: An emergency fund is money set aside to help cover unexpected expenses. The appropriate amount depends on an individual's circumstances and financial needs.
+
+Q: How can a banking chatbot help with budgeting?
+
+A: A banking chatbot can analyze transaction information provided by a user or an application and categorize expenses, summarize spending patterns, identify recurring expenses, and provide general budgeting suggestions.
+
+Q: Can a chatbot provide personalized financial advice?
+
+A: A chatbot can provide general financial-management information and suggestions based on available data. Personalized financial decisions should be evaluated carefully and, where appropriate, discussed with a qualified financial professional.
+
+============================================================
+9. SPENDING PATTERN ANALYSIS
+============================
+
+Q: What is spending pattern analysis?
+
+A: Spending pattern analysis involves examining transaction information to identify categories, frequencies, recurring expenses, and changes in spending behavior.
+
+Q: What categories can transactions be classified into?
+
+A: Transactions can be categorized into groups such as food, transportation, shopping, utilities, entertainment, education, healthcare, housing, and other applicable categories.
+
+Q: How can spending analysis help customers?
+
+A: Spending analysis can help customers understand where their money is being spent, identify recurring expenses, monitor budgets, and make informed financial-management decisions.
+
+Q: What is a recurring expense?
+
+A: A recurring expense is a payment that occurs repeatedly, such as a subscription, utility bill, rent, or other regular payment.
+
+Q: Can spending analysis identify unusual spending?
+
+A: Spending analysis can identify transactions or spending patterns that differ significantly from previously observed patterns. Such differences should be reviewed before concluding that a transaction is fraudulent.
+
+============================================================
+10. FRAUD AND SUSPICIOUS TRANSACTIONS
+=====================================
+
+Q: What is a suspicious transaction?
+
+A: A suspicious transaction is a transaction or transaction pattern that appears unusual based on defined rules, historical behavior, transaction characteristics, or other indicators.
+
+Q: What is transaction anomaly detection?
+
+A: Transaction anomaly detection is the process of identifying transactions that differ significantly from expected or previously observed transaction patterns.
+
+Q: What factors can be used to detect unusual transactions?
+
+A: A system may consider factors such as transaction amount, transaction frequency, transaction location, transaction time, merchant information, and deviation from historical spending patterns.
+
+Q: Does an unusual transaction always mean fraud?
+
+A: No. An unusual transaction does not necessarily mean fraud. It may be a legitimate transaction that differs from previous behavior. Additional verification is required before determining whether fraud has occurred.
+
+Q: What should I do if I suspect a fraudulent transaction?
+
+A: The customer should contact the relevant bank or financial institution through its official support channel as soon as possible and follow its fraud-reporting and account-security procedures.
+
+Q: Can an AI system guarantee that a transaction is fraudulent?
+
+A: No. An AI system can identify potentially unusual patterns or generate alerts, but it should not be treated as a definitive authority that a transaction is fraudulent. Human or bank verification is required.
+
+Q: What is a fraud alert?
+
+A: A fraud alert is a notification indicating that a transaction or activity has been identified as potentially unusual or suspicious based on defined detection criteria.
+
+============================================================
+11. BANKING PRODUCT RECOMMENDATIONS
+===================================
+
+Q: What is a banking product recommendation system?
+
+A: A banking product recommendation system analyzes available customer requirements and relevant product characteristics to identify potentially suitable banking products.
+
+Q: What information can be considered for a basic product recommendation?
+
+A: A basic recommendation system may consider factors such as the customer's stated financial goal, preferred product type, approximate income range, desired loan purpose, savings goal, transaction requirements, and other non-sensitive information relevant to the recommendation.
+
+Q: Can an AI assistant recommend a savings account?
+
+A: An AI assistant can compare general account characteristics such as account type, minimum-balance requirements, available services, and other stated features. The customer should verify current terms with the relevant bank before opening an account.
+
+Q: Can an AI assistant recommend a loan?
+
+A: An AI assistant can provide general information about loan types and explain which products may match stated requirements. Actual loan approval depends on the lender's eligibility assessment and cannot be guaranteed by the chatbot.
+
+Q: Can an AI assistant recommend a credit card?
+
+A: An AI assistant can explain general credit card features and compare products using available information. Customers should consider applicable fees, credit limits, repayment requirements, and terms before choosing a card.
+
+Q: How can a chatbot recommend a financial product?
+
+A: The chatbot can collect basic non-sensitive requirements, compare them with product characteristics available in its knowledge base, and present potentially relevant options with explanations.
+
+Q: Should a chatbot guarantee that a financial product is suitable?
+
+A: No. A chatbot should provide informational recommendations rather than guaranteeing that a financial product is suitable or that an application will be approved.
+
+============================================================
+12. BANK-SPECIFIC AND CURRENT INFORMATION
+=========================================
+
+Q: Does every bank have the same account requirements?
+
+A: No. Account requirements, documents, fees, minimum balances, interest rates, transaction limits, and services can vary between banks and account types.
+
+Q: Can the chatbot provide the current interest rate of a specific bank?
+
+A: Current interest rates are time-sensitive and may change. The chatbot should use a reliable current source or direct the customer to the relevant bank's official website rather than relying on outdated information.
+
+Q: Can the chatbot provide the current fees charged by a bank?
+
+A: Current fees and charges can change and depend on the specific product. The customer should verify the latest information with the relevant bank.
+
+Q: Where should customers verify bank-specific information?
+
+A: Customers should verify current bank-specific information through the bank's official website, official mobile application, branch, or authorized customer-support channel.
+
+============================================================
+13. BANKING SECURITY
+====================
+
+Q: Should I share my OTP with a chatbot?
+
+A: No. Customers should never share OTPs, PINs, CVVs, passwords, full card numbers, or other sensitive authentication information with a chatbot or unauthorized person.
+
+Q: Should I share my banking password with an AI assistant?
+
+A: No. A banking AI assistant should never require a customer's banking password.
+
+Q: What information should not be entered into a banking chatbot?
+
+A: Customers should avoid entering passwords, PINs, OTPs, CVVs, full card numbers, account passwords, and other sensitive authentication credentials.
+
+Q: What should I do if I accidentally shared sensitive banking information?
+
+A: The customer should immediately contact the relevant bank through its official support channel and follow its account-security procedures.
+
+============================================================
+14. AI BANKING ASSISTANT CAPABILITIES
+=====================================
+
+Q: What can the AI Banking Query Assistant do?
+
+A: The AI Banking Query Assistant can answer general questions about banking accounts, transactions, cards, loans, deposits, interest concepts, banking services, financial management, suspicious transaction concepts, and banking products using available information.
+
+Q: Can the AI Banking Query Assistant perform a bank transaction?
+
+A: No. The college-project assistant is designed to provide information and explanations. It does not perform actual banking transactions.
+
+Q: Can the AI Banking Query Assistant access my bank account?
+
+A: No. The assistant should not access or request a customer's private banking credentials or account information.
+
+Q: Can the AI Banking Query Assistant guarantee a loan approval?
+
+A: No. Loan approval is determined by the relevant financial institution according to its eligibility assessment and policies.
+
+Q: Can the AI Banking Query Assistant guarantee a financial return?
+
+A: No. The assistant should not guarantee investment returns, loan approval, interest earnings, or other financial outcomes.
+
+Q: What happens when the chatbot does not know an answer?
+
+A: The chatbot should clearly state when reliable information is unavailable rather than inventing financial information. For current or bank-specific information, customers should verify the information with the relevant bank.
+
+============================================================
+15. IMPORTANT SAFETY RULES
+==========================
+
+Q: Can the chatbot provide exact current bank rates without verification?
+
+A: No. Current interest rates, fees, charges, offers, limits, and bank policies are time-sensitive and should be verified using reliable current information.
+
+Q: Can the chatbot identify fraud with complete certainty?
+
+A: No. The chatbot can identify potentially unusual patterns, but a suspicious transaction is not automatically fraudulent. Bank verification is required.
+
+Q: Can the chatbot make personalized investment decisions?
+
+A: The chatbot can provide general financial education and budgeting information, but it should not present itself as a substitute for a qualified financial professional.
+
+Q: What should the chatbot do when information is uncertain?
+
+A: The chatbot should clearly communicate the uncertainty, avoid inventing facts, and recommend checking an appropriate official or reliable source.
