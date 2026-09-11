@@ -1,5 +1,9 @@
-venv/
 .env
+venv/
+.venv/
 __pycache__/
-*.pyc
-.vscode/
+*.py[cod]
+.pytest_cache/
+database/chroma_db/
+.streamlit/secrets.toml
+.DS_Store

@@ -1,137 +1,190 @@
 # 🏦 Bank AI Assistant
 
-An AI-powered banking assistant that helps users get quick and relevant answers to common banking questions through an interactive conversational interface.
+An AI-powered banking assistant that answers general banking questions using a local banking knowledge base, ChromaDB vector search, and Gemini.
 
-## ✨ Features
+## Architecture
 
-- 🤖 AI-powered banking chatbot
-- 💬 Natural language conversation
-- 🏦 Banking FAQ question answering
-- 🔎 Intelligent information retrieval
-- 📚 Banking knowledge base
-- 🗄️ ChromaDB-based vector search
-- 🐍 Python-based backend
-- 🖥️ Simple and user-friendly interface
+```text
+Base44 Frontend
+      |
+      | POST /chat
+      v
+FastAPI (api.py)
+      |
+      v
+src/chatbot.py
+      |
+      +--> ChromaDB
+      |
+      +--> Gemini
+```
 
-## 🛠️ Technologies Used
+## Features
 
-- Python
-- Artificial Intelligence
-- Large Language Model (LLM)
-- ChromaDB
-- SQLite
-- HTML
-- CSS
-- JavaScript
-- Python Virtual Environment
+- AI-powered banking chatbot
+- Natural-language questions
+- Banking FAQ retrieval
+- ChromaDB vector search
+- Gemini-powered answers
+- FastAPI backend for external frontends such as Base44
+- Safe fallback when AI generation is unavailable
+- Does not perform real banking transactions
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 Bank-AI-Assistant/
-│
+├── api.py
+├── app.py
+├── requirements.txt
+├── render.yaml
+├── .gitignore
+├── .env.example
 ├── data/
 │   └── banking_faq.txt
-│
-├── database/
-│   └── chroma_db/
-│
 ├── src/
 │   ├── chatbot.py
-│   ├── load_data.py
-│   ├── test_llm.py
-│   ├── test_search.py
-│   └── test_web.py
-│
-├── app.py
-├── .gitignore
-└── requirements.txt
+│   └── load_data.py
+└── database/
+    └── chroma_db/
 ```
 
-## 🚀 Getting Started
+## Local Setup
 
-### 1. Clone the Repository
+### 1. Create and activate a virtual environment
 
-```bash
-git clone https://github.com/YOUR-USERNAME/Bank-AI-Assistant.git
-cd Bank-AI-Assistant
-```
-
-### 2. Create a Virtual Environment
+Windows:
 
 ```bash
 python -m venv venv
-```
-
-### 3. Activate the Virtual Environment
-
-For Windows:
-
-```bash
 venv\Scripts\activate
 ```
 
-### 4. Install Dependencies
+### 2. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 5. Configure Environment Variables
+### 3. Create `.env`
 
-Create a `.env` file in the project folder.
-
-Add your required API key:
+Create a `.env` file in the project root:
 
 ```env
-API_KEY=your_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
-⚠️ **Never upload your `.env` file or API keys to GitHub.**
+**Never upload `.env` to GitHub.**
 
-### 6. Run the Application
+### 4. Build the ChromaDB knowledge base
+
+Run this once:
 
 ```bash
-python app.py
+python src/load_data.py
 ```
 
-## 🎯 Project Objective
+This reads `data/banking_faq.txt` and creates the local ChromaDB collection.
 
-The objective of this project is to demonstrate how Artificial Intelligence, Natural Language Processing, and information retrieval can be combined to create an interactive banking assistant.
+### 5. Test the Streamlit application
 
-The system uses a banking knowledge base to provide users with quick and relevant responses to common banking-related questions.
+```bash
+streamlit run app.py
+```
 
-## 🔮 Future Improvements
+### 6. Run the FastAPI backend
 
-- 🎙️ Voice-based banking assistant
-- 🌐 Multilingual support
-- 🔐 User authentication
-- 👤 Personalized banking assistance
-- 🏦 Integration with real banking APIs
-- 📱 Improved mobile interface
-- 🔒 Enhanced security and privacy
-- 📊 User interaction analytics
+```bash
+uvicorn api:app --reload
+```
 
-## 📸 Screenshots
+The API will be available at:
 
-Screenshots of the Bank AI Assistant interface can be added here.
+```text
+http://127.0.0.1:8000/
+```
 
-## ⚠️ Disclaimer
+Swagger API documentation:
 
-This project is created for **educational and demonstration purposes only**.
+```text
+http://127.0.0.1:8000/docs
+```
 
-It is not connected to a real bank and should not be used for real financial transactions.
+Chat endpoint:
 
-## 👨‍💻 Authors
+```text
+POST http://127.0.0.1:8000/chat
+```
 
-- **Yash Koli**
-- **Aryan**
-- **Abhijeet**
+Example request:
 
-## 🎓 Academic Project
+```json
+{
+  "question": "What is a savings account?"
+}
+```
 
-This project was developed as a college/academic project to demonstrate the practical application of Artificial Intelligence, Natural Language Processing, and information retrieval in the banking domain.
+Example response:
 
-## 📄 License
+```json
+{
+  "answer": "..."
+}
+```
 
-This project is intended for educational purposes.
+## Base44 Integration
+
+After deploying the FastAPI backend, use the public HTTPS backend URL in Base44.
+
+For example:
+
+```text
+https://YOUR-BACKEND.onrender.com/chat
+```
+
+Configure Base44 to send:
+
+```http
+POST /chat
+Content-Type: application/json
+```
+
+with:
+
+```json
+{
+  "question": "What is UPI?"
+}
+```
+
+The backend returns:
+
+```json
+{
+  "answer": "..."
+}
+```
+
+## Deployment
+
+The included `render.yaml` is prepared for a Render web service.
+
+The required environment variable is:
+
+```text
+GEMINI_API_KEY
+```
+
+Set it in the deployment platform's environment-variable settings. Do not commit the key.
+
+## Safety
+
+This is an educational project. It does not connect to real bank accounts and does not perform banking transactions.
+
+Users should never provide passwords, PINs, OTPs, CVVs, full card numbers, or other sensitive banking credentials.
+
+Current bank-specific rates, fees, limits, and policies should be verified with the relevant bank.
+
+## License
+
+Educational / academic project.
