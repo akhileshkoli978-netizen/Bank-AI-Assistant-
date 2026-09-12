@@ -1,5 +1,8 @@
 import os
 import re
+import logging
+import random
+import time
 from functools import lru_cache
 from pathlib import Path
 
@@ -15,6 +18,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Use a current Gemini model. You can override it in Render without changing code.
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+GEMINI_FALLBACK_MODEL = os.getenv("GEMINI_FALLBACK_MODEL", "gemini-2.5-flash")
 
 _STOPWORDS = {
     "a", "an", "and", "are", "as", "at", "be", "can", "do", "does", "for",
@@ -158,63 +162,86 @@ USER QUESTION:
 Answer:
 """.strip()
 
-    try:
-        client = _gemini_client()
+    client = _gemini_client()
 
-        # Gemini can temporarily return 503 when the selected model is busy.
-        # Retry a few times with a short exponential backoff before falling
-        # back to the local banking knowledge base.
-        import logging
-        import time
+    def _is_transient_error(exc: Exception) -> bool:
+        error_text = str(exc).lower()
+        return any(marker in error_text for marker in (
+            "503", "unavailable", "service unavailable", "overloaded",
+            "429", "resource_exhausted", "too many requests",
+            "500", "internal server error", "504", "deadline exceeded",
+            "timeout", "timed out",
+        ))
 
+    def _generate(model_name: str, max_attempts: int = 2) -> str | None:
         last_error = None
 
-        for attempt in range(3):
+        for attempt in range(max_attempts):
             try:
-                # This is the supported Google GenAI Python SDK pattern.
+                logging.info(
+                    "Requesting Gemini model %s (attempt %s/%s)",
+                    model_name, attempt + 1, max_attempts
+                )
+
                 response = client.models.generate_content(
-                    model=GEMINI_MODEL,
+                    model=model_name,
                     contents=prompt,
                 )
 
                 answer = getattr(response, "text", None)
-                if answer:
+                if answer and answer.strip():
                     return answer.strip()
 
-                return _fallback_answer(results)
+                logging.warning("Gemini returned an empty response from %s.", model_name)
+                return None
 
             except Exception as exc:
                 last_error = exc
-                error_text = str(exc)
 
-                # A 503 "model is overloaded" response is usually temporary.
-                # Retry after increasing delays: 1s, then 2s.
-                if "503" in error_text or "UNAVAILABLE" in error_text or "overloaded" in error_text.lower():
-                    if attempt < 2:
-                        wait_seconds = 2 ** attempt
-                        logging.warning(
-                            "Gemini temporarily unavailable (attempt %s/3). "
-                            "Retrying in %ss: %s",
-                            attempt + 1,
-                            wait_seconds,
-                            exc,
-                        )
-                        time.sleep(wait_seconds)
-                        continue
+                if not _is_transient_error(exc):
+                    raise
 
-                raise
+                if attempt + 1 < max_attempts:
+                    wait_seconds = (2 ** (attempt + 1)) + random.uniform(0, 1)
+                    logging.warning(
+                        "Transient Gemini error on %s (attempt %s/%s). "
+                        "Retrying in %.1fs: %s",
+                        model_name, attempt + 1, max_attempts,
+                        wait_seconds, exc,
+                    )
+                    time.sleep(wait_seconds)
 
         if last_error:
             raise last_error
+        return None
 
-        return _fallback_answer(results)
+    try:
+        answer = _generate(GEMINI_MODEL, max_attempts=2)
+        if answer:
+            return answer
+    except Exception as primary_error:
+        logging.warning(
+            "Primary Gemini model %s failed: %s",
+            GEMINI_MODEL, primary_error
+        )
 
-    except Exception as exc:
-        # Keep the API useful, but log the real Gemini error so it can be
-        # diagnosed from the Render service logs.
-        import logging
-        logging.exception("Gemini API request failed: %s", exc)
-        return _fallback_answer(results)
+    if GEMINI_FALLBACK_MODEL and GEMINI_FALLBACK_MODEL != GEMINI_MODEL:
+        try:
+            logging.info("Trying fallback Gemini model: %s", GEMINI_FALLBACK_MODEL)
+            answer = _generate(GEMINI_FALLBACK_MODEL, max_attempts=1)
+            if answer:
+                return answer
+        except Exception as fallback_error:
+            logging.warning(
+                "Fallback Gemini model %s also failed: %s",
+                GEMINI_FALLBACK_MODEL, fallback_error
+            )
+
+    logging.warning(
+        "All Gemini generation attempts failed. Returning local FAQ fallback."
+    )
+    return _fallback_answer(results)
+
 
 
 if __name__ == "__main__":
