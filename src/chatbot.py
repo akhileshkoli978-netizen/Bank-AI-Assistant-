@@ -173,8 +173,11 @@ Answer:
 
         return _fallback_answer(results)
 
-    except Exception:
-        # Keep the API useful even if Gemini is temporarily unavailable.
+    except Exception as exc:
+        # Keep the API useful, but log the real Gemini error so it can be
+        # diagnosed from the Render service logs.
+        import logging
+        logging.exception("Gemini API request failed: %s", exc)
         return _fallback_answer(results)
 
 
