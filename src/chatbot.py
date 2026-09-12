@@ -1,174 +1,151 @@
 import os
+import re
+from functools import lru_cache
 from pathlib import Path
 
-import streamlit as st
 from dotenv import load_dotenv
 from google import genai
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_chroma import Chroma
-
-
-# ============================================================
-# Project paths
-# ============================================================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_FILE = BASE_DIR / "data" / "banking_faq.txt"
 
-ENV_FILE = BASE_DIR / ".env"
-DATABASE_DIR = BASE_DIR / "database" / "chroma_db"
+load_dotenv(BASE_DIR / ".env")
 
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-# ============================================================
-# Load environment variables
-# ============================================================
+# Use a current Gemini model. You can override it in Render without changing code.
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
 
-load_dotenv(ENV_FILE)
+_STOPWORDS = {
+    "a", "an", "and", "are", "as", "at", "be", "can", "do", "does", "for",
+    "from", "how", "i", "in", "is", "it", "me", "my", "of", "on", "or",
+    "the", "to", "what", "when", "where", "which", "with", "you", "your",
+}
 
-api_key = os.getenv("GEMINI_API_KEY")
-
-if not api_key:
-    raise ValueError(
-        "GEMINI_API_KEY was not found in .env"
-    )
-
-
-# ============================================================
-# Load Gemini client once
-# ============================================================
-
-@st.cache_resource
-def get_gemini_client():
-
-    return genai.Client(
-        api_key=api_key
-    )
+_SAFETY_TERMS = {
+    "otp", "pin", "cvv", "password", "passcode", "card number",
+    "account number", "credentials",
+}
 
 
-# ============================================================
-# Load embedding model once
-# ============================================================
-
-@st.cache_resource
-def get_embeddings():
-
-    return HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
-    )
+def _tokens(text: str) -> set[str]:
+    words = re.findall(r"[a-z0-9]+", text.lower())
+    return {w for w in words if w not in _STOPWORDS and len(w) > 1}
 
 
-# ============================================================
-# Load ChromaDB once
-# ============================================================
+@lru_cache(maxsize=1)
+def _faq_chunks() -> tuple[str, ...]:
+    """Load and chunk the FAQ once per process.
 
-@st.cache_resource
-def get_vector_store():
+    This intentionally avoids requiring a pre-built Chroma database on Render.
+    The repository's banking_faq.txt remains the single source of knowledge.
+    """
+    if not DATA_FILE.exists():
+        return ()
 
-    embeddings = get_embeddings()
+    text = DATA_FILE.read_text(encoding="utf-8")
+    raw_chunks = re.split(r"\n(?=Q:\s)", text)
 
-    vector_store = Chroma(
-        collection_name="banking_knowledge",
-        embedding_function=embeddings,
-        persist_directory=str(DATABASE_DIR)
-    )
-
-    return vector_store
-
-
-# ============================================================
-# Search local banking knowledge
-# ============================================================
-
-def search_banking_knowledge(question: str):
-
-    vector_store = get_vector_store()
-
-    results = vector_store.similarity_search(
-        question,
-        k=3
-    )
-
-    return results
+    chunks: list[str] = []
+    for chunk in raw_chunks:
+        chunk = chunk.strip()
+        if not chunk:
+            continue
+        # Keep chunks reasonably small for the prompt.
+        if len(chunk) <= 1800:
+            chunks.append(chunk)
+        else:
+            for start in range(0, len(chunk), 1600):
+                part = chunk[start:start + 1800].strip()
+                if part:
+                    chunks.append(part)
+    return tuple(chunks)
 
 
-# ============================================================
-# Create fallback answer
-# ============================================================
+def _retrieve(question: str, k: int = 4) -> list[str]:
+    chunks = _faq_chunks()
+    if not chunks:
+        return []
 
-def create_fallback_answer(results):
+    q_tokens = _tokens(question)
+    if not q_tokens:
+        return list(chunks[:k])
 
+    scored = []
+    q_lower = question.lower()
+
+    for index, chunk in enumerate(chunks):
+        c_tokens = _tokens(chunk)
+        overlap = len(q_tokens & c_tokens)
+        phrase_bonus = 2 if q_lower in chunk.lower() else 0
+        score = overlap + phrase_bonus
+
+        if score > 0:
+            scored.append((score, -index, chunk))
+
+    scored.sort(reverse=True)
+    return [chunk for _, _, chunk in scored[:k]]
+
+
+def _fallback_answer(results: list[str]) -> str:
     if not results:
-
         return (
-            "Sorry, I could not find relevant information "
-            "in the banking knowledge base."
+            "Sorry, I could not find relevant information in the banking "
+            "knowledge base."
         )
 
-    information = []
-
-    for document in results:
-
-        information.append(
-            document.page_content
-        )
-
-    answer = (
-        "⚠️ The AI generation service is temporarily "
-        "unavailable.\n\n"
-        "Here is the relevant information available "
-        "in the banking knowledge base:\n\n"
-    )
-
-    answer += "\n\n".join(information)
-
-    return answer
-
-
-# ============================================================
-# Main Banking Assistant
-# ============================================================
-
-def ask_banking_assistant(question: str):
-
-    # --------------------------------------------------------
-    # 1. Search local knowledge base
-    # --------------------------------------------------------
-
-    results = search_banking_knowledge(question)
-
-
-    # --------------------------------------------------------
-    # 2. Create context
-    # --------------------------------------------------------
-
-    context = "\n\n".join(
-        document.page_content
-        for document in results
+    return (
+        "⚠️ The AI generation service is temporarily unavailable.\n\n"
+        "Here is the relevant information available in the banking "
+        "knowledge base:\n\n" + "\n\n".join(results)
     )
 
 
-    # --------------------------------------------------------
-    # 3. Prompt
-    # --------------------------------------------------------
+@lru_cache(maxsize=1)
+def _gemini_client():
+    if not GEMINI_API_KEY:
+        raise RuntimeError(
+            "GEMINI_API_KEY is not configured on the server."
+        )
+    return genai.Client(api_key=GEMINI_API_KEY)
+
+
+def ask_banking_assistant(question: str) -> str:
+    question = question.strip()
+    if not question:
+        return "Please enter a banking question."
+
+    results = _retrieve(question)
+
+    # Never send credentials back to the model or request them.
+    lowered = question.lower()
+    if any(term in lowered for term in _SAFETY_TERMS):
+        # The model can answer general safety questions, but the prompt
+        # explicitly prevents requesting sensitive information.
+        pass
+
+    context = "\n\n".join(results)
+    if not context:
+        context = (
+            "No matching entry was found in the current banking knowledge base."
+        )
 
     prompt = f"""
-You are an AI Banking Query Assistant for a college project.
+You are the AI Banking Query Assistant for a college project.
 
-Answer the user's question using the banking knowledge
-provided below.
+Answer the user's question using ONLY the banking knowledge provided below.
 
-IMPORTANT RULES:
-
-1. Use the provided banking context.
-2. Do not invent banking information.
-3. Do not invent interest rates, fees, eligibility,
-   policies, or other financial details.
-4. If the answer is not available in the context,
-   clearly say that it is not available in the current
-   banking knowledge base.
-5. Do not perform banking transactions.
-6. Never ask for passwords, PINs, OTPs, CVV, account
-   numbers, or other sensitive banking credentials.
-7. Keep the answer simple and easy to understand.
+Rules:
+1. Do not invent banking information.
+2. Do not invent current interest rates, fees, eligibility rules, policies,
+   limits, or offers.
+3. If the answer is not in the knowledge base, say that clearly.
+4. Never ask the user for an OTP, PIN, CVV, password, full card number,
+   account password, or other sensitive banking credentials.
+5. Do not perform or claim to perform real banking transactions.
+6. For bank-specific or current information, tell the user to verify it
+   with the relevant bank's official channel.
+7. Keep the answer concise and easy to understand.
 
 BANKING KNOWLEDGE:
 ------------------
@@ -178,61 +155,28 @@ BANKING KNOWLEDGE:
 USER QUESTION:
 {question}
 
-Provide a concise answer based only on the banking knowledge.
-"""
-
-
-    # --------------------------------------------------------
-    # 4. Try Gemini
-    # --------------------------------------------------------
+Answer:
+""".strip()
 
     try:
+        client = _gemini_client()
 
-        client = get_gemini_client()
-
-        interaction = client.interactions.create(
-            model="gemini-3.6-flash",
-            input=prompt
+        # This is the supported Google GenAI Python SDK pattern.
+        response = client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
         )
 
-        return interaction.output_text
+        answer = getattr(response, "text", None)
+        if answer:
+            return answer.strip()
 
+        return _fallback_answer(results)
 
-    # --------------------------------------------------------
-    # 5. Gemini quota / API failure
-    # --------------------------------------------------------
+    except Exception:
+        # Keep the API useful even if Gemini is temporarily unavailable.
+        return _fallback_answer(results)
 
-    except Exception as e:
-
-        error_message = str(e).lower()
-
-        if (
-            "quota" in error_message
-            or "429" in error_message
-            or "rate" in error_message
-            or "too_many_requests" in error_message
-        ):
-
-            return create_fallback_answer(results)
-
-        # Other API errors also get a safe fallback
-        return create_fallback_answer(results)
-
-
-# ============================================================
-# Terminal testing
-# ============================================================
 
 if __name__ == "__main__":
-
-    question = input(
-        "Ask your banking question: "
-    )
-
-    answer = ask_banking_assistant(question)
-
-    print(
-        "\n========== BANK AI ASSISTANT ==========\n"
-    )
-
-    print(answer)
+    print(ask_banking_assistant(input("Ask your banking question: ")))
