@@ -4,15 +4,12 @@ from pydantic import BaseModel, Field
 
 from src.chatbot import ask_banking_assistant
 
-
 app = FastAPI(
     title="Bank AI Assistant API",
     description="API for the Bank AI Assistant college project.",
-    version="1.0.0",
+    version="1.1.0",
 )
 
-
-# Base44/frontend access
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -48,8 +45,9 @@ def chat(request: ChatRequest):
     try:
         answer = ask_banking_assistant(request.question)
         return {"answer": answer}
-    except Exception as e:
+    except Exception as exc:
+        # Do not expose API keys or internal stack traces to the client.
         raise HTTPException(
             status_code=500,
             detail="The banking assistant could not process the request.",
-        ) from e
+        ) from exc
