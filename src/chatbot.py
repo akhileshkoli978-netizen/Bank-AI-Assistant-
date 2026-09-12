@@ -1,8 +1,5 @@
 import os
 import re
-import logging
-import random
-import time
 from functools import lru_cache
 from pathlib import Path
 
@@ -18,7 +15,11 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Use a current Gemini model. You can override it in Render without changing code.
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
-GEMINI_FALLBACK_MODEL = os.getenv("GEMINI_FALLBACK_MODEL", "gemini-2.5-flash")
+GEMINI_FALLBACK_MODELS = [
+    "gemini-3.7-flash",
+    "gemini-3.6-flash",
+    "gemini-3.5-flash-lite",
+]
 
 _STOPWORDS = {
     "a", "an", "and", "are", "as", "at", "be", "can", "do", "does", "for",
@@ -162,86 +163,94 @@ USER QUESTION:
 Answer:
 """.strip()
 
-    client = _gemini_client()
+    try:
+        client = _gemini_client()
 
-    def _is_transient_error(exc: Exception) -> bool:
-        error_text = str(exc).lower()
-        return any(marker in error_text for marker in (
-            "503", "unavailable", "service unavailable", "overloaded",
-            "429", "resource_exhausted", "too many requests",
-            "500", "internal server error", "504", "deadline exceeded",
-            "timeout", "timed out",
-        ))
+        import logging
+        import random
+        import time
 
-    def _generate(model_name: str, max_attempts: int = 2) -> str | None:
-        last_error = None
+        # Try the main model first, then current fallback models.
+        models_to_try = [GEMINI_MODEL] + [
+            model for model in GEMINI_FALLBACK_MODELS
+            if model != GEMINI_MODEL
+        ]
 
-        for attempt in range(max_attempts):
-            try:
-                logging.info(
-                    "Requesting Gemini model %s (attempt %s/%s)",
-                    model_name, attempt + 1, max_attempts
-                )
+        for model_name in models_to_try:
+            for attempt in range(3):
+                try:
+                    response = client.models.generate_content(
+                        model=model_name,
+                        contents=prompt,
+                    )
 
-                response = client.models.generate_content(
-                    model=model_name,
-                    contents=prompt,
-                )
+                    answer = getattr(response, "text", None)
+                    if answer:
+                        return answer.strip()
 
-                answer = getattr(response, "text", None)
-                if answer and answer.strip():
-                    return answer.strip()
+                    break
 
-                logging.warning("Gemini returned an empty response from %s.", model_name)
-                return None
+                except Exception as exc:
+                    error_text = str(exc)
+                    upper_error = error_text.upper()
 
-            except Exception as exc:
-                last_error = exc
+                    is_quota = (
+                        "429" in error_text
+                        or "RESOURCE_EXHAUSTED" in upper_error
+                        or "QUOTA" in upper_error
+                    )
+                    is_temporary = (
+                        "503" in error_text
+                        or "UNAVAILABLE" in upper_error
+                        or "OVERLOADED" in upper_error
+                        or "500" in error_text
+                        or "504" in error_text
+                    )
+                    is_timeout = "TIMEOUT" in upper_error
 
-                if not _is_transient_error(exc):
+                    if is_quota:
+                        logging.warning(
+                            "Gemini model %s quota unavailable. "
+                            "Trying next model: %s",
+                            model_name,
+                            exc,
+                        )
+                        break
+
+                    if (is_temporary or is_timeout) and attempt < 2:
+                        wait_seconds = (2 ** attempt) + random.uniform(0, 0.5)
+                        logging.warning(
+                            "Gemini model %s temporarily unavailable "
+                            "(attempt %s/3). Retrying in %.1fs: %s",
+                            model_name,
+                            attempt + 1,
+                            wait_seconds,
+                            exc,
+                        )
+                        time.sleep(wait_seconds)
+                        continue
+
+                    if "404" in error_text or "NOT_FOUND" in upper_error:
+                        logging.warning(
+                            "Gemini model %s is unavailable. "
+                            "Trying next model: %s",
+                            model_name,
+                            exc,
+                        )
+                        break
+
                     raise
 
-                if attempt + 1 < max_attempts:
-                    wait_seconds = (2 ** (attempt + 1)) + random.uniform(0, 1)
-                    logging.warning(
-                        "Transient Gemini error on %s (attempt %s/%s). "
-                        "Retrying in %.1fs: %s",
-                        model_name, attempt + 1, max_attempts,
-                        wait_seconds, exc,
-                    )
-                    time.sleep(wait_seconds)
-
-        if last_error:
-            raise last_error
-        return None
-
-    try:
-        answer = _generate(GEMINI_MODEL, max_attempts=2)
-        if answer:
-            return answer
-    except Exception as primary_error:
         logging.warning(
-            "Primary Gemini model %s failed: %s",
-            GEMINI_MODEL, primary_error
+            "All Gemini generation attempts failed. "
+            "Returning local FAQ fallback."
         )
+        return _fallback_answer(results)
 
-    if GEMINI_FALLBACK_MODEL and GEMINI_FALLBACK_MODEL != GEMINI_MODEL:
-        try:
-            logging.info("Trying fallback Gemini model: %s", GEMINI_FALLBACK_MODEL)
-            answer = _generate(GEMINI_FALLBACK_MODEL, max_attempts=1)
-            if answer:
-                return answer
-        except Exception as fallback_error:
-            logging.warning(
-                "Fallback Gemini model %s also failed: %s",
-                GEMINI_FALLBACK_MODEL, fallback_error
-            )
-
-    logging.warning(
-        "All Gemini generation attempts failed. Returning local FAQ fallback."
-    )
-    return _fallback_answer(results)
-
+    except Exception as exc:
+        import logging
+        logging.exception("Gemini API request failed: %s", exc)
+        return _fallback_answer(results)
 
 
 if __name__ == "__main__":
