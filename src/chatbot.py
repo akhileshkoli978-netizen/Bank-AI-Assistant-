@@ -174,9 +174,12 @@ Answer:
         return _fallback_answer(results)
 
     except Exception as exc:
-    import logging
-    logging.exception("Gemini API request failed: %s", exc)
-    return _fallback_answer(results)
+        # Keep the API useful, but log the real Gemini error so it can be
+        # diagnosed from the Render service logs.
+        import logging
+        logging.exception("Gemini API request failed: %s", exc)
+        return _fallback_answer(results)
+
 
 if __name__ == "__main__":
     print(ask_banking_assistant(input("Ask your banking question: ")))
