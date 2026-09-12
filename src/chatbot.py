@@ -161,15 +161,51 @@ Answer:
     try:
         client = _gemini_client()
 
-        # This is the supported Google GenAI Python SDK pattern.
-        response = client.models.generate_content(
-            model=GEMINI_MODEL,
-            contents=prompt,
-        )
+        # Gemini can temporarily return 503 when the selected model is busy.
+        # Retry a few times with a short exponential backoff before falling
+        # back to the local banking knowledge base.
+        import logging
+        import time
 
-        answer = getattr(response, "text", None)
-        if answer:
-            return answer.strip()
+        last_error = None
+
+        for attempt in range(3):
+            try:
+                # This is the supported Google GenAI Python SDK pattern.
+                response = client.models.generate_content(
+                    model=GEMINI_MODEL,
+                    contents=prompt,
+                )
+
+                answer = getattr(response, "text", None)
+                if answer:
+                    return answer.strip()
+
+                return _fallback_answer(results)
+
+            except Exception as exc:
+                last_error = exc
+                error_text = str(exc)
+
+                # A 503 "model is overloaded" response is usually temporary.
+                # Retry after increasing delays: 1s, then 2s.
+                if "503" in error_text or "UNAVAILABLE" in error_text or "overloaded" in error_text.lower():
+                    if attempt < 2:
+                        wait_seconds = 2 ** attempt
+                        logging.warning(
+                            "Gemini temporarily unavailable (attempt %s/3). "
+                            "Retrying in %ss: %s",
+                            attempt + 1,
+                            wait_seconds,
+                            exc,
+                        )
+                        time.sleep(wait_seconds)
+                        continue
+
+                raise
+
+        if last_error:
+            raise last_error
 
         return _fallback_answer(results)
 
